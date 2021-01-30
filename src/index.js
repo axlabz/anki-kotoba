@@ -2,6 +2,8 @@ const { toHiragana } = require('wanakana')
 const fetch = require('node-fetch')
 const domino = require('domino')
 
+const kanji = require('./kanji')
+
 /**
  * The deck containing the Core 6K entries. We use those mainly for the audio
  * and sample sentences.
@@ -62,6 +64,8 @@ async function listYomichanEntries({ word, reading, onlyNew }) {
 			.join(','),
 		furigana_text: it.fields['furigana-plain'].value,
 		furigana_html: it.fields['furigana'].value,
+
+		kanji: kanji.list(it.fields['expression'].value),
 
 		// Yomichan sometimes parses random text from around an entry as the
 		// sentence, so we try to filter those out.

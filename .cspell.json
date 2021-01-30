@@ -23,6 +23,7 @@
 	"ignorePaths": [
 		".vscode/**",
 		"build/**",
+		"data/kanji/**",
 		"node_modules/**",
 		"package-lock.json",
 		"package.json",
