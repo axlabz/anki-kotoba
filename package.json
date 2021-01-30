@@ -28,6 +28,7 @@
 		"prettier": "^2.2.1"
 	},
 	"dependencies": {
+		"domino": "^2.1.6",
 		"node-fetch": "^2.6.1",
 		"wanakana": "^4.0.2"
 	}
