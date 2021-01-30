@@ -29,7 +29,7 @@ main().catch((err) => console.error(err))
  * Main function for this script.
  */
 async function main() {
-	const core = await getCoreEntry({ word: '食べる' })
+	const core = await listCoreEntry({ word: '食べる' })
 	json(core)
 
 	const word = await listYomichanEntries({})
@@ -62,6 +62,9 @@ async function listYomichanEntries({ word, reading, onlyNew }) {
 			.join(','),
 		furigana_text: it.fields['furigana-plain'].value,
 		furigana_html: it.fields['furigana'].value,
+
+		// Yomichan sometimes parses random text from around an entry as the
+		// sentence, so we try to filter those out.
 		sentence: it.fields['sentence'].value
 			.replace(/[\u{0021}-\u{00FF}]/gu, '')
 			.replace(/^\s+|\s+$/g, '')
@@ -230,7 +233,7 @@ async function listYomichanEntries({ word, reading, onlyNew }) {
 /**
  * Get an entry from the core deck.
  */
-async function getCoreEntry({ word, reading }) {
+async function listCoreEntry({ word, reading }) {
 	const ls = await queryNotes({ deck: CORE_DECK, keywords: [word] })
 	const output = ls.map((it) => ({
 		id: it.noteId,
