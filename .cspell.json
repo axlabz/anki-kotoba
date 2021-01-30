@@ -2,7 +2,23 @@
 	"version": "0.1",
 	"$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/master/cspell.schema.json",
 	"language": "en",
-	"words": ["anki", "kotoba", "lcov", "serializers", "unmocked"],
+	"words": [
+		"anki",
+		"dbpedia",
+		"furigana",
+		"jisho",
+		"jlpt",
+		"jmdict",
+		"jmnedict",
+		"kirei",
+		"kotoba",
+		"lcov",
+		"serializers",
+		"unmocked",
+		"wanakana",
+		"wanikani",
+		"yomichan"
+	],
 	"flagWords": [],
 	"ignorePaths": [
 		".vscode/**",
@@ -10,6 +26,7 @@
 		"node_modules/**",
 		"package-lock.json",
 		"package.json",
+		"docs/sample-jisho.json",
 		"tsconfig.json",
 		"yarn.lock"
 	],
