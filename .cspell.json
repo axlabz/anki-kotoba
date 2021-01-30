@@ -2,8 +2,16 @@
 	"version": "0.1",
 	"$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/master/cspell.schema.json",
 	"language": "en",
-	"words": ["anki", "kotoba"],
+	"words": ["anki", "kotoba", "lcov", "serializers", "unmocked"],
 	"flagWords": [],
-	"ignorePaths": ["package.json", "package-lock.json", "yarn.lock", "tsconfig.json", "node_modules/**", ".vscode/**"],
+	"ignorePaths": [
+		".vscode/**",
+		"build/**",
+		"node_modules/**",
+		"package-lock.json",
+		"package.json",
+		"tsconfig.json",
+		"yarn.lock"
+	],
 	"ignoreRegExpList": []
 }
