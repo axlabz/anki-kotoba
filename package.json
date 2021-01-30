@@ -1,0 +1,21 @@
+{
+	"name": "anki-kotoba",
+	"version": "0.1.0",
+	"description": "Random scripts for Anki and Japanese",
+	"main": "src/index.js",
+	"private": true,
+	"scripts": {
+		"start": "node src/index.js",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git@github.com:ax-lab/anki-kotoba.git"
+	},
+	"keywords": [
+		"anki",
+		"japanese"
+	],
+	"author": "axemac",
+	"license": "MIT"
+}
