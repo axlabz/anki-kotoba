@@ -4,6 +4,12 @@ const domino = require('domino')
 
 const kanji = require('./kanji')
 const tag = require('./tag')
+const { initAnki, addNote, queryAnki } = require('./anki')
+
+/**
+ * The main deck to which vocabulary notes will be generated.
+ */
+const MAIN_DECK = 'Japanese::Vocab'
 
 /**
  * The deck containing the Core 6K entries. We use those mainly for the audio
@@ -32,8 +38,12 @@ main().catch((err) => console.error(err))
  * Main function for this script.
  */
 async function main() {
+	await initAnki(MAIN_DECK)
+
 	const list = await listNewNotes()
-	json(list)
+	for (const it of list) {
+		await addNote(MAIN_DECK, it)
+	}
 }
 
 /**
@@ -54,6 +64,23 @@ async function listNewNotes() {
 			frequency: it.frequency, // Frequency (number of usages in corpus text).
 			audio: '',
 
+			kanji: ((kanji) => {
+				const output = kanji.map((k) => {
+					return []
+						.concat(
+							[
+								`<span class="kanji" title="${k.on.concat(k.kun).join(' ')}">\n`,
+								`    <em>${k.kanji}</em>\n`,
+								`    <ul>`,
+							],
+							k.meanings.map((it) => `<li>${it}</li>`),
+							[`</ul>\n`, `</span>`],
+						)
+						.join('')
+				})
+				return output.join('\n')
+			})(it.kanji),
+
 			yomichan_id: it.id, // ID of the source Yomichan note.
 			yomichan_audio: it.audio, // Audio from Yomichan.
 			yomichan_glossary: it.glossary, // Original glossary (for reference and comparison).
@@ -67,7 +94,8 @@ async function listNewNotes() {
 			entry.core_index = core.core
 			entry.core_order = core.index
 			entry.core_audio = core.audio
-			entry.example_text = core.sentence_main
+			entry.example_main = core.sentence_main
+			entry.example_text = core.sentence_text
 			entry.example_read = renderFurigana(core.sentence_read)
 			entry.example_audio = core.sentence_audio
 			entry.example_image = core.sentence_image
@@ -341,25 +369,6 @@ async function queryNotes({ deck, tags, keywords, predicates }) {
 
 	const notes = await queryAnki('findNotes', { query: query.join(' ') })
 	return await queryAnki('notesInfo', { notes })
-}
-
-/**
- * Send a request to Anki (depends on the anki-connect plugin being installed).
- */
-async function queryAnki(action, params) {
-	const args = {
-		method: 'POST',
-		body: JSON.stringify({
-			action: action,
-			version: 6,
-			params: params,
-		}),
-	}
-	const data = await fetch('http://127.0.0.1:8765/', args).then((data) => data.json())
-	if (data.error) {
-		throw new Error(`failed to connect to anki: ${data.error}`)
-	}
-	return data.result
 }
 
 /**
