@@ -1,5 +1,8 @@
 // model-script.js - the content of this file is included in the model template
 
+const TOOLTIP_SHOW_DELAY = 500
+const TOOLTIP_HIDE_DELAY = 200
+
 init()
 
 function init() {
@@ -39,11 +42,12 @@ function onAnswer() {
 	})
 
 	card.querySelectorAll('.notes').forEach((el) => {
-		const btn = button('✓', () => toggleFurigana(el))
+		const btn = button('❕', () => toggleFurigana(el))
 		btn.style.display = 'inline-block'
 		btn.style.position = 'absolute'
-		btn.style.right = '20px'
-		btn.style.marginTop = '-1em'
+		btn.style.top = '0px'
+		btn.style.left = '-32px'
+		btn.style.fontSize = '0.7em'
 		btn.title = 'Toggle furigana'
 		el.appendChild(btn)
 	})
@@ -133,7 +137,7 @@ function installTooltips(root) {
 		timeout(() => {
 			tt.style.visibility = 'visible'
 			tt.style.opacity = 1
-		}, 350)
+		}, TOOLTIP_SHOW_DELAY)
 	}
 
 	const hide = () => {
@@ -144,7 +148,7 @@ function installTooltips(root) {
 				tt.curParent = null
 				tt.style.visibility = 'hidden'
 			}, 500)
-		}, 500)
+		}, TOOLTIP_HIDE_DELAY)
 	}
 
 	root.querySelectorAll('[title]').forEach((el) => {

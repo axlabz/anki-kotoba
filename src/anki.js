@@ -9,7 +9,7 @@ const C_LINK = '#00c3ff'
 const C_SECONDARY = '#0092bf'
 
 const STATS = [
-	`<div style="position: absolute; top: 10px; right: 10px; color: ${C_GREY}; opacity: 0.5; font-size: 0.4em">`,
+	`<div style="position: absolute; top: 10px; right: 10px; color: ${C_GREY}; opacity: 0.4; font-size: 0.3em">`,
 	`{{#core-index}}&nbsp;#{{core-index}}{{/core-index}}`,
 	`{{#core-order}}&nbsp;/&nbsp;{{core-order}}{{/core-order}}`,
 	`{{#frequency}}&nbsp;({{frequency}}){{/frequency}}`,
@@ -49,14 +49,14 @@ const MODEL = {
 		/* [X] */ 'notes',
 		/* [X] */ 'kanji',
 		/* [X] */ 'glossary',
-		/* [ ] */ 'image',
+		/* [X] */ 'image',
 		/* [X] */ 'example-main',
 		/* [X] */ 'example-text',
 		/* [X] */ 'example-read',
 		/* [X] */ 'example-audio',
 		/* [X] */ 'example-image',
 		/* [X] */ 'yomichan-id',
-		/* [ ] */ 'yomichan-audio',
+		/* [X] */ 'yomichan-audio',
 		/* [X] */ 'yomichan-glossary',
 		/* [X] */ 'yomichan-sentence',
 		/* [X] */ 'core-id',
@@ -106,6 +106,15 @@ const MODEL = {
 		{{/reading}}
 		<div class="glossary">{{glossary}}</div>
 
+		<div style="font-size: 0.4em">
+		<a class="button" title="forvo.com (pronunciation)" href="https://forvo.com/search/{{text:expression}}/">🔊</a>
+		<a class="button" title="jisho.org (word)" href="https://jisho.org/search/{{text:expression}}">🔎</a>
+		<a class="button" title="tatoeba.org (sentences)" href='https://tatoeba.org/eng/sentences/search?query="{{text:expression}}"&from=jpn&to=und'>💬</a>
+		<a class="button" title="jisho.org (kanji)" href="https://jisho.org/search/{{text:expression}}%23kanji">🈁</a>
+		</div>
+
+		{{#image}}<hr>{{image}}{{/image}}
+
 		{{#kanji}}
 		<hr><div class="kanji">{{kanji}}</div>
 		{{/kanji}}
@@ -142,7 +151,7 @@ const MODEL = {
 		}
 
 		.card {
-			font-size: 5vw;
+			font-size: 40px;
 			text-align: center;
 			font-family: Main, Japanese, ${JP_FONTS};
 		}
@@ -150,19 +159,22 @@ const MODEL = {
 		.japanese-alt { font-family: Main, Japanese-alt, ${JP_FONTS}; }
 		.ui-text      { font-family: Japanese-alt, ${UI_FONTS}; }
 
-		h1, h2       { font-weight: normal; font-size: 1.5em; position: relative; margin-right: 0; margin-left: 0; }
+		h1, h2       { font-weight: normal; font-size: 1.5em; position: relative; margin-right: 0; margin-left: 0; padding: 0; }
 		h2           { font-size: 1.1em;  }
 		h1 + h2      { margin-top: -0.3em; }
-		h1 rt, h2 rt { font-size: 0.3em;  }
+		h1 rt, h2 rt { font-size: 0.25em;  }
+
+		rt { color: ${C_HIGH}; visibility: hidden; font-family: Japanese-alt; font-size: 12px; }
 
 		i { display: none; color: ${C_SECONDARY}; font-style: normal; font-size: 0.8em; }
 
 		a, a:visited, a:hover { color: ${C_LINK} !important; text-decoration: none; }
 
-		.button { color: ${C_LINK}; cursor: pointer; opacity: 0.3; transition: opacity 0.3s; }
-		.button:hover { opacity: 1.0; }
+		img { max-width: 350px; }
 
-		rt { color: ${C_HIGH}; visibility: hidden; font-family: Japanese-alt; }
+		.button { color: ${C_GREY}; cursor: pointer; opacity: 0.3; transition-property: opacity, color; transition-duration: 0.5s; }
+		.button:hover { color: ${C_LINK}; opacity: 1.0; }
+
 		.reading { cursor: pointer; }
 
 		.audio { display: inline-block; position: absolute; right: 10px; transform: scale(0.5); margin-top: -0.15em; }
@@ -170,10 +182,27 @@ const MODEL = {
 		.radical { font-family: Radicals, Japanese-alt; }
 		.stroke  { font-family: Stroke, Japanese-alt; }
 
-		.glossary { font-size: 0.5em; display: inline-block; text-align: left; max-width: 70%; }
-		.glossary em { display: inline-block; margin-left: 20px; font-size: 0.9em; font-style: normal; color: ${C_HIGH}; float: right; }
+		.notes {
+			display: inline-block;
+			position: relative;
+			max-width: 70%;
+			margin: auto;
+			font-size: 0.5em;
+			opacity: 0.7;
+			text-align: left;
+			font-family: Main, Japanese-alt, ${JP_FONTS};
+		}
 
-		.notes { display: inline-block; max-width: 70%; font-size: 0.5em; opacity: 0.7; }
+		.glossary { font-size: 0.5em; display: inline-block; text-align: left; max-width: 70%; }
+		.glossary em {
+			display: inline-block;
+			margin-left: 20px;
+			font-size: 0.7em;
+			margin-top: 0.3em;
+			font-style: normal;
+			color: ${C_HIGH};
+			float: right;
+		}
 
 		.kanji { max-width: 70%; display: inline-block; text-align: left; }
 		.kanji > span {
@@ -243,10 +272,6 @@ const MODEL = {
 		.toolbar button {
 			width: 30px;
 			height: 30px;
-		}
-
-		img {
-			max-width: 350px;
 		}
 
 		.search-radical {
