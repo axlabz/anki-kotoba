@@ -21,6 +21,7 @@ function onAnswer() {
 	const card = document.querySelector('.card')
 	setTimeout(() => installTooltips(card), 0)
 	initRubyTooltips(card)
+	initRadicalDescription(card)
 
 	const button = (text, fn) => {
 		const btn = document.createElement('span')
@@ -175,3 +176,52 @@ function initRubyTooltips(root) {
 		el.title = read.join('')
 	})
 }
+
+function initRadicalDescription(root) {
+	const main = root.querySelector('.radical-container')
+	const txt = (main && main.getAttribute('data-radicals')) || ''
+	const html = txt
+		.split(/\s*;\s*/)
+		.map((it) => {
+			const ls = it.trim().split(/\s*:\s*/)
+			const kanji = (ls.length > 1 ? ls[0].trim() : '').replace(
+				/\([^)]+\)/g,
+				(x) => `&nbsp;<span class="radical-stroke">${x}</span>`,
+			)
+			const txt = ls.length > 1 ? ls[1].trim() : it.trim()
+			const head = kanji ? `<span class="radical-head">${kanji} = </span>` : ``
+			const parts = txt.split(/\s*\+\s*/)
+			const out = []
+			for (const it of parts) {
+				if (!it) {
+					continue
+				}
+				radicals(it).forEach((x) => {
+					if (x.radical) {
+						out.push(
+							[
+								`<span class="radical">`,
+								`<span class="radical-char">${x.radical}</span>`,
+								`<span class="radical-meaning">${x.meaning}</span>`,
+								`<span class="radical-stroke">(${x.stroke})</span>`,
+								`</span>`,
+							].join(''),
+						)
+					} else {
+						const txt = x.raw_text.replace(
+							/\(\d+\)/g,
+							(x) => `&nbsp;<span class="radical-stroke">${x}</span>`,
+						)
+						out.push(`<span>${txt}</span>`)
+					}
+				})
+			}
+			return head + out.join('&nbsp;+ ')
+		})
+		.join('<br>')
+	if (main && html) {
+		main.innerHTML = html
+	}
+}
+
+// {{radicals.js}}

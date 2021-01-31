@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>Radical search</title>
+	<style>
+		body {
+			background-color: #333;
+			color: #ccc;
+			font-family: "JapaneseRadicals-Regular", sans-serif;
+			text-align: center;
+			padding: 20px;
+			font-size: 20px;
+		}
+
+		hr {
+			border: 1px solid #111;
+		}
+
+		input {
+			height: 2em;
+			min-width: 20em;
+			font-size: 20px;
+		}
+
+		input:focus,
+		button:focus {
+			outline-width: 0;
+		}
+
+		table {
+			display: inline-block;
+			margin: auto;
+			padding: 0;
+			max-width: 500px;
+			width: 50%;
+			border: 0px;
+			border-collapse: collapse;
+			cursor: pointer;
+		}
+
+		tbody {
+			padding: 0;
+			margin: 0;
+			display: block;
+		}
+
+		td {
+			height: 1.5em;
+			vertical-align: middle;
+		}
+
+		td:nth-of-type(1) {
+			font-size: 1.5em;
+			padding: 0 1em 0 1em;
+		}
+
+		td:nth-of-type(2) {
+			width: 3em;
+		}
+
+		td:nth-of-type(3) {
+			text-align: left;
+			padding-left: 2em;
+		}
+
+		td:nth-of-type(4) {
+			text-align: left;
+		}
+
+		tr {
+			transition: background-color 0.5s;
+			padding: 2px;
+			display: block;
+		}
+
+		tr:hover {
+			background-color: #111;
+		}
+
+		.small {
+			color: gray;
+			font-size: 0.7em;
+		}
+
+		button {
+			min-width: 30px;
+			min-height: 30px;
+			background-color: #005abb;
+			color: white;
+			border: 0px;
+			border-radius: 3px;
+		}
+
+		button:hover,
+		button:focus {
+			background-color: #0074f0;
+		}
+
+		button:active {
+			background-color: #ff7b00;
+		}
+
+		.toolbar {
+			visibility: hidden;
+		}
+	</style>
+	<script src="src/radicals.js"></script>
+	<script>
+		function doSearch() {
+			const text = document.querySelector('input').value.trim().split(/\s+/)
+			const results = document.querySelector('.results')
+			const list = radicals()
+			const ls = []
+			for (const it of list) {
+				let valid = true
+				text.forEach(txt => {
+					if (txt && (it.meaning + it.notes + it.position + it.stroke).indexOf(txt) < 0) {
+						valid = false
+					}
+				})
+				if (valid) {
+					ls.push(it)
+				}
+			}
+
+			const output = ls.map(row => `
+				<tr onclick="add('${row.radical}')">
+					<td>
+						<span class="radical" style="width: 30px">${row.radical}<span>
+					</td>
+					<td class="small">(${row.stroke})</td>
+					<td>
+						${row.meaning}
+						<span class="small">${row.position ? '(' + row.position + ')' : ''}</span>
+					</td>
+				</tr>`).join('\n')
+			results.innerHTML = `<table>${output}</table>`
+		}
+
+		function add(radical) {
+			const output = document.querySelector('.value')
+			output.textContent += radical
+			const toolbar = document.querySelector('.toolbar')
+			toolbar.style.visibility = output.textContent ? 'visible' : 'hidden'
+		}
+
+		function back() {
+			const output = document.querySelector('.value')
+			const txt = output.textContent
+			if (txt) {
+				output.textContent = txt.slice(0, txt.length - 1)
+			}
+			const toolbar = document.querySelector('.toolbar')
+			toolbar.style.visibility = output.textContent ? 'visible' : 'hidden'
+		}
+
+		function clearAll() {
+			const output = document.querySelector('.value')
+			output.textContent = ''
+			const toolbar = document.querySelector('.toolbar')
+			toolbar.style.visibility = 'hidden'
+		}
+
+		function copy() {
+			const output = document.querySelector('.value')
+			const text = output.textContent
+			navigator.clipboard.writeText(text).then(function () {
+				console.log('Copied!')
+			}, function (err) {
+				console.error('Failed!', err)
+			});
+		}
+	</script>
+</head>
+
+<body>
+	<input type="text" spellcheck="false" oninput="doSearch()">
+	<hr>
+	<div class="output">
+		<span class="value" style="display: inline-block; min-width: 300px"></span>
+		<span class="toolbar">
+			<button onclick="copy()">Copy</button>
+			<button onclick="back()">Back</button>
+			<button onclick="clearAll()">Clear</button>
+		</span>
+	</div>
+	<hr>
+	<div class="results">
+	</div>
+	<script>
+		setTimeout(() => document.querySelector('input').focus(), 10)
+		doSearch()
+	</script>
+</body>
+
+</html>

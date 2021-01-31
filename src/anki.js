@@ -115,6 +115,8 @@ const MODEL = {
 
 		{{#image}}<hr>{{image}}{{/image}}
 
+		{{#radicals}}<hr><div class="radical-container" data-radicals="{{text:radicals}}"></div>{{/radicals}}
+
 		{{#kanji}}
 		<hr><div class="kanji">{{kanji}}</div>
 		{{/kanji}}
@@ -179,7 +181,6 @@ const MODEL = {
 
 		.audio { display: inline-block; position: absolute; right: 10px; transform: scale(0.5); margin-top: -0.15em; }
 
-		.radical { font-family: Radicals, Japanese-alt; }
 		.stroke  { font-family: Stroke, Japanese-alt; }
 
 		.notes {
@@ -203,6 +204,15 @@ const MODEL = {
 			color: ${C_HIGH};
 			float: right;
 		}
+
+		.radical-container {
+			font-family: Radicals, Japanese-alt, ${JP_FONTS};
+			font-size: 0.5em;
+			display: inline-block;
+		}
+		.radical-char      { color: ${C_HIGH}; }
+		.radical-stroke    { color: ${C_GREY}; font-size: 12px; padding: 0 3px 0 3px; }
+		.radical-meaning   { padding-left: 5px; }
 
 		.kanji { max-width: 70%; display: inline-block; text-align: left; }
 		.kanji > span {
@@ -305,7 +315,9 @@ async function initAnki(mainDeck) {
 	const modelName = MODEL.name(mainDeck)
 	const hasModel = (await queryAnki('modelNames')).indexOf(modelName) >= 0
 
-	const front = text(MODEL.front).replace('%SCRIPT%', fs.readFileSync('./src/model-script.js'))
+	const front = text(MODEL.front)
+		.replace('%SCRIPT%', fs.readFileSync('./src/model-script.js'))
+		.replace('// {{radicals.js}}', '// radicals.js\n\n' + fs.readFileSync('./src/radicals.js'))
 	const back = text(MODEL.back)
 	const css = text(MODEL.css)
 

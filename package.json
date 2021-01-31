@@ -6,7 +6,8 @@
 	"private": true,
 	"scripts": {
 		"start": "node src/index.js",
-		"test": "jest"
+		"test": "jest",
+		"radicals": "open-cli radicals.html"
 	},
 	"repository": {
 		"type": "git",
@@ -25,6 +26,7 @@
 		"eslint-plugin-jest": "^24.1.3",
 		"eslint-plugin-only-warn": "^1.0.2",
 		"jest": "^26.6.3",
+		"open-cli": "^6.0.1",
 		"prettier": "^2.2.1"
 	},
 	"dependencies": {
