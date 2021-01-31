@@ -24,6 +24,7 @@
 		".vscode/**",
 		"build/**",
 		"data/kanji/**",
+		"data/tags/**",
 		"node_modules/**",
 		"package-lock.json",
 		"package.json",

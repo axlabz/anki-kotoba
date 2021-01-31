@@ -1,0 +1,93 @@
+[
+	[
+		"given",
+		"name",
+		4,
+		"given name or forename, gender not specified",
+		0
+	],
+	[
+		"organization",
+		"name",
+		4,
+		"organization name",
+		0
+	],
+	[
+		"surname",
+		"name",
+		4,
+		"family or surname",
+		0
+	],
+	[
+		"place",
+		"name",
+		4,
+		"place name",
+		0
+	],
+	[
+		"work",
+		"name",
+		4,
+		"work of art, literature, music, etc. name",
+		0
+	],
+	[
+		"person",
+		"name",
+		4,
+		"full name of a particular person",
+		0
+	],
+	[
+		"fem",
+		"name",
+		4,
+		"female given name or forename",
+		0
+	],
+	[
+		"station",
+		"name",
+		4,
+		"railway station",
+		0
+	],
+	[
+		"ok",
+		"",
+		0,
+		"old or irregular kana form",
+		0
+	],
+	[
+		"unclass",
+		"name",
+		4,
+		"unclassified name",
+		0
+	],
+	[
+		"company",
+		"name",
+		4,
+		"company name",
+		0
+	],
+	[
+		"product",
+		"name",
+		4,
+		"product name",
+		0
+	],
+	[
+		"masc",
+		"name",
+		4,
+		"male given name or forename",
+		0
+	]
+]

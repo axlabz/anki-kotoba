@@ -3,6 +3,7 @@ const fetch = require('node-fetch')
 const domino = require('domino')
 
 const kanji = require('./kanji')
+const tag = require('./tag')
 
 /**
  * The deck containing the Core 6K entries. We use those mainly for the audio
@@ -31,14 +32,16 @@ main().catch((err) => console.error(err))
  * Main function for this script.
  */
 async function main() {
-	const core = await listCoreEntry({ word: '食べる' })
-	json(core)
+	// const core = await listCoreEntry({ word: '食べる' })
+	// json(core)
 
-	const word = await listYomichanEntries({})
-	json(word)
+	// const word = await listYomichanEntries({})
+	// json(word)
 
-	const jisho = await queryWord({ word: 'gin' })
-	json(jisho)
+	// const jisho = await queryWord({ word: 'gin' })
+	// json(jisho)
+
+	console.log(tag('P'))
 }
 
 /**
