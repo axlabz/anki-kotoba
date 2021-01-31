@@ -3,6 +3,17 @@ const fetch = require('node-fetch')
 
 // spell-checker: disable
 
+const CLR_HIGH = '#ffd154'
+const CLR_GREY = '#c0c0c0'
+
+const STATS = [
+	`<div style="position: absolute; top: 10px; right: 10px; color: ${CLR_GREY}; opacity: 0.5; font-size: 0.4em">`,
+	`{{#core-index}}&nbsp;#{{core-index}}{{/core-index}}`,
+	`{{#core-order}}&nbsp;/&nbsp;{{core-order}}{{/core-order}}`,
+	`{{#frequency}}&nbsp;({{frequency}}){{/frequency}}`,
+	`</div>`,
+].join('')
+
 const MODEL = {
 	name: (deckName) => `${deckName}_model`,
 
@@ -39,15 +50,39 @@ const MODEL = {
 	],
 
 	front: `
-		<h1>{{furigana}}</h1>
-		{{#expression-alt}}<h2>({{expression-alt}})</h2>{{/expression-alt}}
+		<h1 class="reading">{{furigana}}</h1>
+		{{#expression-alt}}<h2 class="reading">({{expression-alt}})</h2>{{/expression-alt}}
+		${STATS}
+
+		{{#example-read}}
+		<hr><span class="reading">{{example-read}}</span>
+		{{/example-read}}
 
 		<script>
 		%SCRIPT%</script>
 	`,
 
 	back: `
-		{{glossary}}
+		<h1 class="reading">
+		{{furigana}}
+		<span class="audio">{{audio}} {{^audio}}{{tts ja_JP:expression}}{{/audio}}</span>
+		</h1>
+		{{#expression-alt}}<h2 class="reading">({{expression-alt}})</h2>{{/expression-alt}}
+		${STATS}
+
+		{{#example-read}}
+		<div style="position: relative">
+		<hr>
+		<span class="reading" title="{{example-text}}">{{example-read}}</span>
+		<span class="audio">{{example-audio}}</span>
+		</div>
+		{{/example-read}}
+
+		<hr>
+		{{#reading}}
+		<div style="font-size: 0.5em; font-family: Japanese-alt; color: ${CLR_GREY}; opacity: 0.7">{{reading}}</div>
+		{{/reading}}
+		<div class="glossary">{{glossary}}</div>
 	`,
 
 	css: `
@@ -69,11 +104,18 @@ const MODEL = {
 		}
 
 		@font-face {
+			font-family: Japanese-alt;
+			src: url("_NotoSansCJKjp-Thin.otf");
+		}
+
+		@font-face {
 			font-family: Radicals;
 			src: url("_JapaneseRadicals-Regular.ttf")
 		}
 
 		.card {
+			font-size: 5vw;
+			text-align: center;
 			font-family:
 				Main, Japanese,
 				'ヒラギノ角ゴ ProN', 'Hiragino Kaku Gothic ProN', '游ゴシック', '游ゴシック体',
@@ -81,40 +123,27 @@ const MODEL = {
 				HiraKakuProN-W3, 'TakaoExゴシック', TakaoExGothic, 'MotoyaLCedar',
 				'Droid Sans Japanese',
 				"calibri", "Candara", "Segoe", "Segoe UI", "Optima", Arial, sans-serif;
-			font-size: 30px;
-			text-align: center;
 		}
 
-		.radical {
-			font-family: Radicals, Japanese;
-		}
+		h1, h2       { font-weight: normal; font-size: 1.5em; position: relative; }
+		h2           { font-size: 1.1em;  }
+		h1 + h2      { margin-top: -0.3em; }
+		h1 rt, h2 rt { font-size: 0.3em;  }
 
-		.stroke {
-			font-family: Stroke;
-		}
+		a, a:visited, a:hover { color: #bfdfff !important; text-decoration: none; }
 
-		h1, h2 {
-			font-weight: normal;
-			font-size: 2em;
-		}
+		rt { color: ${CLR_HIGH}; visibility: hidden; font-family: Japanese-alt; }
+		.reading { cursor: pointer; }
 
-		h2 {
-			font-size: 1.3em;
-		}
+		.audio { display: inline-block; position: absolute; right: 10px; transform: scale(0.5); margin-top: -0.15em; }
 
-		h1 + h2 {
-			margin-top: -10px;
-		}
+		.radical { font-family: Radicals, Japanese; }
+		.stroke  { font-family: Stroke; }
 
-		rt {
-			color: #ff4ff6;
-			visibility: hidden;
-		}
+		.glossary { font-size: 0.5em; display: inline-block; text-align: left; max-width: 70%; }
+		.glossary em { display: inline-block; margin-left: 20px; font-size: 0.9em; font-style: normal; color: ${CLR_HIGH}; float: right; }
 
-		h1 rt, h2 rt {
-			font-size: 0.25em;
-		}
-
+		/*
 		.toolbar {
 			position: absolute;
 			top: 10px;
@@ -125,16 +154,6 @@ const MODEL = {
 			color: #00c8ff;
 			display: none;
 			font-size: 0.5em;
-		}
-
-		.audio {
-			display: inline-block;
-			transform: scale(0.5);
-		}
-
-		.reading {
-			font-size: 0.75em;
-			opacity: 0.5;
 		}
 
 		.glossary {
@@ -157,11 +176,6 @@ const MODEL = {
 			max-width: 350px;
 		}
 
-		a, a:visited, a:hover {
-		  color: #C0C0C0 !important;
-		  text-decoration: none;
-		}
-
 		.search-radical {
 			font-size: 16px;
 		}
@@ -177,6 +191,7 @@ const MODEL = {
 		.toolbar-bottom:hover {
 			opacity: 1;
 		}
+		*/
 	`,
 }
 

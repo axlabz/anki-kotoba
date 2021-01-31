@@ -297,19 +297,21 @@ async function listYomichanEntries({ word, reading, onlyNew }) {
 						.join(', ')})</em>`,
 				)
 			if (node.text.every((x) => typeof x == 'string' && x.length < 20)) {
-				tags()
-				out.push(' ')
 				out.push(node.text.join(', '))
+				out.push(' ')
+				tags()
 			} else {
 				const tag = first ? 'ol' : 'ul'
-				tags()
 				out.push(`<${tag}>`)
-				node.text.forEach((x) => {
+				node.text.forEach((x, i) => {
 					out.push('<li>')
 					if (typeof x == 'string') {
 						out.push(x)
 					} else {
 						out.push(renderNode(x))
+					}
+					if (i == 0) {
+						tags()
 					}
 					out.push('</li>')
 				})
