@@ -21,4 +21,4 @@ const tagMap = {}
 	})
 })
 
-module.exports = (name) => tagMap[name] || { name, order: 0 }
+module.exports = (name) => tagMap[name] || { name: name, category: '', order: 0, score: 0, description: '' }

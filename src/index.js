@@ -32,16 +32,53 @@ main().catch((err) => console.error(err))
  * Main function for this script.
  */
 async function main() {
-	const core = await listCoreEntry({ word: '食べる' })
-	json(core)
+	const list = await listNewNotes()
+	json(list)
+}
 
-	const word = await listYomichanEntries({})
-	json(word)
+/**
+ * Returns a list of new notes to add to the main Anki deck. This function
+ * will query new Yomichan entries in Anki and compile their data alongside
+ * fields from the Core 6K deck and kanji data.
+ */
+async function listNewNotes() {
+	const output = []
+	const newEntries = await listYomichanEntries({ onlyNew: true })
+	for (const it of newEntries) {
+		const entry = {
+			key: it.key, // Plain furigana, we use this as key for its uniqueness.
+			expression: it.word, // Entry expression.
+			reading: it.read, // Entry reading.
+			furigana: it.furigana_html, // Entry with furigana (HTML).
+			glossary: it.text, // Vocabulary in english (HTML).
+			frequency: it.frequency, // Frequency (number of usages in corpus text).
+			audio: '',
 
-	const jisho = await queryWord({ word: 'gin' })
-	json(jisho)
+			yomichan_id: it.id, // ID of the source Yomichan note.
+			yomichan_audio: it.audio, // Audio from Yomichan.
+			yomichan_glossary: it.glossary, // Original glossary (for reference and comparison).
+			yomichan_sentence: it.sentence, // Parsed sentence from Yomichan.
+		}
 
-	console.log(tag('P'))
+		// Try to load additional data from Core 6K
+		const [core] = await listCoreEntry({ word: entry.expression, reading: entry.reading })
+		if (core) {
+			entry.core_id = core.id
+			entry.core_index = core.core
+			entry.core_order = core.index
+			entry.core_audio = core.audio
+			entry.example_text = core.sentence_main
+			entry.example_read = renderFurigana(core.sentence_read)
+			entry.example_audio = core.sentence_audio
+			entry.example_image = core.sentence_image
+			entry.core_sentence_read = core.sentence_read
+		}
+
+		entry.audio = entry.core_audio || entry.yomichan_audio
+
+		output.push(entry)
+	}
+	return output
 }
 
 /**
@@ -57,9 +94,10 @@ async function listYomichanEntries({ word, reading, onlyNew }) {
 
 	const ls = await queryNotes({ deck: YOMICHAN_DECK, keywords, tags })
 	const output = ls.map((it) => ({
+		id: it.noteId,
 		key: it.fields['furigana-plain'].value,
 		word: it.fields['expression'].value,
-		read: it.fields['reading'].value,
+		read: it.fields['reading'].value || '',
 		text: parseGlossary(it.fields['glossary'].value),
 		tags: it.fields['tags'].value
 			.split(/\s*,\s*/)
@@ -67,6 +105,8 @@ async function listYomichanEntries({ word, reading, onlyNew }) {
 			.join(','),
 		furigana_text: it.fields['furigana-plain'].value,
 		furigana_html: it.fields['furigana'].value,
+
+		audio: it.fields['audio'].value,
 
 		kanji: kanji.list(it.fields['expression'].value),
 
@@ -77,6 +117,9 @@ async function listYomichanEntries({ word, reading, onlyNew }) {
 			.replace(/^\s+|\s+$/g, '')
 			.replace(/\s\s+/, ' '),
 		frequency: parseFrequency(it.fields['frequencies'].value),
+
+		// Keep a copy of the original glossary for reference.
+		glossary: it.fields['glossary'].value,
 	}))
 
 	return output.filter((it) => {
@@ -200,7 +243,31 @@ async function listYomichanEntries({ word, reading, onlyNew }) {
 
 		const renderNode = (node, first) => {
 			const out = []
-			const tags = () => node.tags.length && out.push(`<em class='tags'>(${node.tags.join(', ')})</em>`)
+
+			const tagList = [...node.tags]
+			tagList.sort((a, b) => {
+				const tagA = tag(a)
+				const tagB = tag(b)
+				if (tagA.order != tagB.order) {
+					return tagA.order - tagB.order
+				} else {
+					return tagA.name.localeCompare(tagB.name)
+				}
+			})
+
+			const tags = () =>
+				node.tags.length &&
+				out.push(
+					`<em class='tags'>(${tagList
+						.map((name) => {
+							const tagInfo = tag(name)
+							if (tagInfo.description) {
+								return `<span title="${tagInfo.description}">${tagInfo.name}</span>`
+							}
+							return tagInfo.name
+						})
+						.join(', ')})</em>`,
+				)
 			if (node.text.every((x) => typeof x == 'string' && x.length < 20)) {
 				tags()
 				out.push(' ')
@@ -255,6 +322,8 @@ async function listCoreEntry({ word, reading }) {
 		sentence_read: it.fields['Reading'].value,
 		sentence_text: it.fields['Sentence-English'].value,
 		sentence_audio: it.fields['Sentence-Audio'].value,
+		sentence_image: it.fields['Sentence-Image'].value,
+		caution: it.fields['Caution'].value,
 	}))
 	return output.filter((it) => it.word == word && (!reading || it.read == reading))
 }
@@ -296,7 +365,7 @@ async function queryAnki(action, params) {
 /**
  * Query Jisho for a word definition.
  */
-function queryWord({ word, reading, exact }) {
+function queryJisho({ word, reading, exact }) {
 	const hiraganaWord = toHiragana(word)
 	const hiraganaRead = (reading && toHiragana(reading)) || ''
 	const output = fetch(`https://jisho.org/api/v1/search/words?keyword=${word}`)
@@ -348,6 +417,92 @@ function mapJishoTag(tag) {
 		'usually written using kana alone': 'kana',
 	}
 	return mapping[tag.toLowerCase()] || tag.toLowerCase()
+}
+
+function renderFurigana(text) {
+	const window = domino.createWindow(text)
+	const document = window.document
+	mapFurigana(document.body, document)
+	return document.body.innerHTML
+}
+
+function mapFurigana(el, document) {
+	if (el.tagName) {
+		for (const it of el.childNodes) {
+			mapFurigana(it, document)
+		}
+	} else {
+		const STA = '<ruby>'
+		const END = '</ruby>'
+		const ruby = []
+		let input = el.textContent
+		let rubySta = 0
+		let rubyEnd = 0
+		while (input.length) {
+			const spc = input.indexOf(' ') // spaces are used to break up sections
+			const brk = input.indexOf('[') // brackets delimit the reading
+
+			// push a literal (non-furigana) text to the output
+			const lit = (txt) => {
+				// is there a ruby tag open?
+				if (rubySta > rubyEnd) {
+					ruby.push(END) // if yes then close it
+					rubyEnd++
+				}
+				if (txt) {
+					ruby.push(txt) // push the literal text
+				}
+			}
+			if (spc >= 0 && spc < brk) {
+				lit(input.slice(0, spc))
+				input = input.slice(spc + 1)
+			} else if (brk >= 0) {
+				const text = input.slice(0, brk) // main text block
+				input = input.slice(brk + 1)
+				const end = input.indexOf(']') // the end delimiter for the reading
+				if (end >= 0) {
+					const read = input.slice(0, end)
+					input = input.slice(end + 1)
+					// is there a ruby tag open?
+					if (rubySta == rubyEnd) {
+						ruby.push(STA) // if not then open it
+						rubySta++
+					}
+					// push the text and its reading
+					ruby.push(text, '<rt>', read, '</rt>')
+				} else {
+					lit(text + '[') // invalid markup, push the literal text
+				}
+			} else {
+				// no delimiters, just push the entire text
+				lit(input)
+				input = ''
+			}
+		}
+		// close any ruby left open
+		if (rubySta > rubyEnd) {
+			ruby.push(END)
+			rubyEnd++
+		}
+
+		if (rubySta > 0) {
+			// unless we have a single ruby tag, wrap everything in a span.
+			if (rubySta > 1 || ruby[0] != STA || ruby[ruby.length - 1] != END) {
+				if (el.parentNode.childNodes.length > 1) {
+					ruby.unshift('<span>')
+					ruby.push('</span>')
+				}
+			}
+			// replace with the ruby
+			if (el.parentNode.childNodes.length > 1) {
+				const span = document.createElement('span')
+				span.innerHTML = ruby.join('')
+				el.replaceWith(span.children[0])
+			} else {
+				el.parentNode.innerHTML = ruby.join('')
+			}
+		}
+	}
 }
 
 function dom(html) {
