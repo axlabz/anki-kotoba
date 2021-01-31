@@ -21,32 +21,32 @@ const MODEL = {
 
 	cardName: 'Card',
 	fields: [
-		'key',
-		'expression',
-		'expression-alt',
-		'reading',
-		'furigana',
-		'frequency',
-		'audio',
-		'radicals',
-		'notes',
-		'kanji',
-		'glossary',
-		'image',
-		'example-main',
-		'example-text',
-		'example-read',
-		'example-audio',
-		'example-image',
-		'yomichan-id',
-		'yomichan-audio',
-		'yomichan-glossary',
-		'yomichan-sentence',
-		'core-id',
-		'core-index',
-		'core-order',
-		'core-audio',
-		'core-sentence-read',
+		/* [X] */ 'key',
+		/* [X] */ 'expression',
+		/* [X] */ 'expression-alt',
+		/* [X] */ 'reading',
+		/* [X] */ 'furigana',
+		/* [X] */ 'frequency',
+		/* [X] */ 'audio',
+		/* [ ] */ 'radicals',
+		/* [ ] */ 'notes',
+		/* [X] */ 'kanji',
+		/* [X] */ 'glossary',
+		/* [ ] */ 'image',
+		/* [X] */ 'example-main',
+		/* [X] */ 'example-text',
+		/* [X] */ 'example-read',
+		/* [X] */ 'example-audio',
+		/* [X] */ 'example-image',
+		/* [X] */ 'yomichan-id',
+		/* [ ] */ 'yomichan-audio',
+		/* [X] */ 'yomichan-glossary',
+		/* [X] */ 'yomichan-sentence',
+		/* [X] */ 'core-id',
+		/* [X] */ 'core-index',
+		/* [X] */ 'core-order',
+		/* [X] */ 'core-audio',
+		/* [X] */ 'core-sentence-read',
 	],
 
 	front: `
@@ -83,6 +83,10 @@ const MODEL = {
 		<div style="font-size: 0.5em; font-family: Japanese-alt; color: ${CLR_GREY}; opacity: 0.7">{{reading}}</div>
 		{{/reading}}
 		<div class="glossary">{{glossary}}</div>
+
+		{{#kanji}}
+		<hr><div class="kanji">{{kanji}}</div>
+		{{/kanji}}
 	`,
 
 	css: `
@@ -137,11 +141,34 @@ const MODEL = {
 
 		.audio { display: inline-block; position: absolute; right: 10px; transform: scale(0.5); margin-top: -0.15em; }
 
-		.radical { font-family: Radicals, Japanese; }
-		.stroke  { font-family: Stroke; }
+		.radical { font-family: Radicals, Japanese-alt; }
+		.stroke  { font-family: Stroke, Japanese-alt; }
 
 		.glossary { font-size: 0.5em; display: inline-block; text-align: left; max-width: 70%; }
 		.glossary em { display: inline-block; margin-left: 20px; font-size: 0.9em; font-style: normal; color: ${CLR_HIGH}; float: right; }
+
+		.kanji { max-width: 70%; display: inline-block; text-align: left; }
+		.kanji > span {
+			display: flex;
+			flex-wrap: nowrap;
+			flex-direction: row;
+			justify-content: start;
+			align-items: center;
+			align-content: start
+		}
+		.kanji > span > *  { flex: 1 1 auto; }
+		.kanji > span > ul { margin: 0; padding: 0; list-style-type: none; }
+		.kanji > span li   { display: inline; font-size: 0.5em}
+		.kanji > span li:after { content: ', ' }
+		.kanji > span li:last-child:after { content: '' }
+
+		.kanji > span > em {
+			width: 1.2em;
+			flex: 0 0 auto;
+			font-style: normal;
+			font-family: Stroke, Japanese-alt;
+			font-size: 3em;
+		}
 
 		/*
 		.toolbar {

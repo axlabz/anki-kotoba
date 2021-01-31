@@ -69,8 +69,10 @@ async function listNewNotes() {
 					return []
 						.concat(
 							[
-								`<span class="kanji" title="${k.on.concat(k.kun).join(' ')}">\n`,
-								`    <em>${k.kanji}</em>\n`,
+								`<span>\n`,
+								`    <em data-on="${k.on.join(',')}" data-kun="${k.kun.join(',')}" title="${k.on
+									.concat(k.kun)
+									.join(' ')}">${k.kanji}</em>\n`,
 								`    <ul>`,
 							],
 							k.meanings.map((it) => `<li>${it}</li>`),
