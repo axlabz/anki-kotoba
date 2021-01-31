@@ -82,7 +82,13 @@ const MODEL = {
 	back: `
 		<h1>
 		<span class="reading">{{furigana}}</span>
-		<span class="audio">{{audio}}{{audio-alt}}{{^audio}}{{tts ja_JP:expression}}{{/audio}}</span>
+		<span class="audio">
+			{{audio}}{{audio-alt}}
+			{{^audio}}
+				{{#reading}}{{tts ja_JP:reading}}{{/reading}}
+				{{^reading}}{{tts ja_JP:expression}}{{/reading}}
+			{{/audio}}
+		</span>
 		</h1>
 		{{#expression-alt}}<h2 class="reading">({{expression-alt}})</h2>{{/expression-alt}}
 		${STATS}
@@ -369,6 +375,9 @@ async function addNote(mainDeck, note) {
 	const fields = {}
 	fields['key'] = v(note.key)
 	fields['expression'] = v(note.expression)
+	if (note.expression_alt) {
+		fields['expression-alt'] = v(note.expression_alt)
+	}
 	fields['reading'] = v(note.reading)
 	fields['furigana'] = v(note.furigana)
 	fields['frequency'] = v(note.frequency)
@@ -408,6 +417,7 @@ async function addNote(mainDeck, note) {
 			console.log(`Added note ${id} for ${note.key}`)
 		} else {
 			console.log(`Could not add note for ${note.key}`)
+			return false
 		}
 	} else {
 		await queryAnki('updateNoteFields', {
@@ -418,6 +428,7 @@ async function addNote(mainDeck, note) {
 		})
 		console.log(`Updated note ${id} for ${note.key}`)
 	}
+	return true
 }
 
 /**

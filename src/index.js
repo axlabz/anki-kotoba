@@ -7,9 +7,14 @@ const tag = require('./tag')
 const { initAnki, addNote, queryAnki } = require('./anki')
 
 /**
+ * Tag added to new entries by Yomichan.
+ */
+const TAG_YOMICHAN_NEW = 'yomichan-new'
+
+/**
  * The main deck to which vocabulary notes will be generated.
  */
-const MAIN_DECK = 'Japanese::Vocab'
+const MAIN_DECK = 'Japanese::Vocabulary'
 
 /**
  * The deck containing the Core 6K entries. We use those mainly for the audio
@@ -42,7 +47,13 @@ async function main() {
 
 	const list = await listNewNotes()
 	for (const it of list) {
-		await addNote(MAIN_DECK, it)
+		const ok = await addNote(MAIN_DECK, it)
+		if (ok) {
+			await queryAnki('removeTags', {
+				notes: [it.yomichan_id],
+				tags: TAG_YOMICHAN_NEW,
+			})
+		}
 	}
 }
 
@@ -90,7 +101,9 @@ async function listNewNotes() {
 		}
 
 		// Try to load additional data from Core 6K
-		const [core] = await listCoreEntry({ word: entry.expression, reading: entry.reading })
+		const [coreWord] = await listCoreEntry({ word: entry.expression, reading: entry.reading })
+		const [coreRead] = await listCoreEntry({ word: entry.reading, reading: entry.reading })
+		const core = coreWord || coreRead
 		if (core) {
 			entry.core_id = core.id
 			entry.core_index = core.core
@@ -121,7 +134,7 @@ async function listYomichanEntries({ word, reading, onlyNew }) {
 	reading && keywords.push(reading)
 
 	const tags = []
-	onlyNew && tags.push('yomichan-new')
+	onlyNew && tags.push(TAG_YOMICHAN_NEW)
 
 	const ls = await queryNotes({ deck: YOMICHAN_DECK, keywords, tags })
 	const output = ls.map((it) => ({
@@ -341,6 +354,9 @@ async function listYomichanEntries({ word, reading, onlyNew }) {
  * Get an entry from the core deck.
  */
 async function listCoreEntry({ word, reading }) {
+	if (!word) {
+		return []
+	}
 	const ls = await queryNotes({ deck: CORE_DECK, keywords: [word] })
 	const output = ls.map((it) => ({
 		id: it.noteId,
