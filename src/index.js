@@ -1,6 +1,7 @@
 const { toHiragana } = require('wanakana')
 const fetch = require('node-fetch')
 const domino = require('domino')
+const fs = require('fs')
 
 const kanji = require('./kanji')
 const tag = require('./tag')
@@ -44,6 +45,19 @@ main().catch((err) => console.error(err))
  */
 async function main() {
 	await initAnki(MAIN_DECK)
+
+	// Write the radical index HTML files to the media folder.
+	const base64 = (txt) => Buffer.from(txt).toString('base64')
+	const radicalsHTML = fs.readFileSync('./radicals.html').toString().replace('src/radicals.js', '_radicals-index.js')
+	const radicalsJS = fs.readFileSync('./src/radicals.js')
+	await queryAnki('storeMediaFile', {
+		filename: '_radicals-index.html',
+		data: base64(radicalsHTML),
+	})
+	await queryAnki('storeMediaFile', {
+		filename: '_radicals-index.js',
+		data: base64(radicalsJS),
+	})
 
 	const list = await listNewNotes()
 	for (const it of list) {

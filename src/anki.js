@@ -1,4 +1,5 @@
 const fs = require('fs')
+const path = require('path')
 const fetch = require('node-fetch')
 
 // spell-checker: disable
@@ -37,33 +38,33 @@ const MODEL = {
 
 	cardName: 'Card',
 	fields: [
-		/* [X] */ 'key',
-		/* [X] */ 'expression',
-		/* [X] */ 'expression-alt',
-		/* [X] */ 'reading',
-		/* [X] */ 'furigana',
-		/* [X] */ 'frequency',
-		/* [X] */ 'audio',
-		/* [X] */ 'audio-alt',
-		/* [ ] */ 'radicals',
-		/* [X] */ 'notes',
-		/* [X] */ 'kanji',
-		/* [X] */ 'glossary',
-		/* [X] */ 'image',
-		/* [X] */ 'example-main',
-		/* [X] */ 'example-text',
-		/* [X] */ 'example-read',
-		/* [X] */ 'example-audio',
-		/* [X] */ 'example-image',
-		/* [X] */ 'yomichan-id',
-		/* [X] */ 'yomichan-audio',
-		/* [X] */ 'yomichan-glossary',
-		/* [X] */ 'yomichan-sentence',
-		/* [X] */ 'core-id',
-		/* [X] */ 'core-index',
-		/* [X] */ 'core-order',
-		/* [X] */ 'core-audio',
-		/* [X] */ 'core-sentence-read',
+		'key',
+		'expression',
+		'expression-alt',
+		'reading',
+		'furigana',
+		'frequency',
+		'audio',
+		'audio-alt',
+		'radicals',
+		'notes',
+		'kanji',
+		'glossary',
+		'image',
+		'example-main',
+		'example-text',
+		'example-read',
+		'example-audio',
+		'example-image',
+		'yomichan-id',
+		'yomichan-audio',
+		'yomichan-glossary',
+		'yomichan-sentence',
+		'core-id',
+		'core-index',
+		'core-order',
+		'core-audio',
+		'core-sentence-read',
 	],
 
 	front: `
@@ -117,6 +118,7 @@ const MODEL = {
 		<a class="button" title="jisho.org (word)" href="https://jisho.org/search/{{text:expression}}">🔎</a>
 		<a class="button" title="tatoeba.org (sentences)" href='https://tatoeba.org/eng/sentences/search?query="{{text:expression}}"&from=jpn&to=und'>💬</a>
 		<a class="button" title="jisho.org (kanji)" href="https://jisho.org/search/{{text:expression}}%23kanji">🈁</a>
+		<a class="button" title="radicals list" href="_radicals-index.html">🧩</a>
 		</div>
 
 		{{#image}}<hr>{{image}}{{/image}}
@@ -180,7 +182,7 @@ const MODEL = {
 
 		img { max-width: 350px; }
 
-		.button { color: ${C_GREY}; cursor: pointer; opacity: 0.3; transition-property: opacity, color; transition-duration: 0.5s; }
+		.button { color: ${C_GREY}; cursor: pointer; opacity: 0.2; transition-property: opacity, color; transition-duration: 0.5s; }
 		.button:hover { color: ${C_LINK}; opacity: 1.0; }
 
 		.reading { cursor: pointer; }
@@ -260,52 +262,6 @@ const MODEL = {
 			opacity: 0;
 			visibility: hidden;
 		}
-
-		/*
-		.toolbar {
-			position: absolute;
-			top: 10px;
-			right: 10px;
-		}
-
-		i {
-			color: #00c8ff;
-			display: none;
-			font-size: 0.5em;
-		}
-
-		.glossary {
-			font-size: 0.5em;
-			display: inline-block;
-
-		}
-
-		.tags {
-			font-size: 0.4em;
-			opacity: 0.4;
-		}
-
-		.toolbar button {
-			width: 30px;
-			height: 30px;
-		}
-
-		.search-radical {
-			font-size: 16px;
-		}
-
-		.toolbar-bottom {
-			position: fixed;
-			bottom: 10px;
-			width: 100%;
-			opacity: 0;
-			transition: opacity 0.5s;
-		}
-
-		.toolbar-bottom:hover {
-			opacity: 1;
-		}
-		*/
 	`,
 }
 
