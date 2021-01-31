@@ -105,6 +105,7 @@ async function listNewNotes() {
 		}
 
 		entry.audio = entry.core_audio || entry.yomichan_audio
+		entry.audio_alt = entry.core_audio ? entry.yomichan_audio : ''
 
 		output.push(entry)
 	}

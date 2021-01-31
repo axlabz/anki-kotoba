@@ -3,16 +3,32 @@ const fetch = require('node-fetch')
 
 // spell-checker: disable
 
-const CLR_HIGH = '#ffd154'
-const CLR_GREY = '#c0c0c0'
+const C_HIGH = '#ffd154'
+const C_GREY = '#c0c0c0'
+const C_LINK = '#00c3ff'
+const C_SECONDARY = '#0092bf'
 
 const STATS = [
-	`<div style="position: absolute; top: 10px; right: 10px; color: ${CLR_GREY}; opacity: 0.5; font-size: 0.4em">`,
+	`<div style="position: absolute; top: 10px; right: 10px; color: ${C_GREY}; opacity: 0.5; font-size: 0.4em">`,
 	`{{#core-index}}&nbsp;#{{core-index}}{{/core-index}}`,
 	`{{#core-order}}&nbsp;/&nbsp;{{core-order}}{{/core-order}}`,
 	`{{#frequency}}&nbsp;({{frequency}}){{/frequency}}`,
 	`</div>`,
 ].join('')
+
+const JP_FONTS = [
+	`'ヒラギノ角ゴ ProN', 'Hiragino Kaku Gothic ProN', '游ゴシック', '游ゴシック体'`,
+	`YuGothic, 'Yu Gothic', 'メイリオ', Meiryo, 'ＭＳ ゴシック', 'MS Gothic'`,
+	`HiraKakuProN-W3, 'TakaoExゴシック', TakaoExGothic, 'MotoyaLCedar'`,
+	`'Droid Sans Japanese'`,
+	`"calibri", "Candara", "Segoe", "Segoe UI", "Optima", Arial, sans-serif`,
+].join(', ')
+
+const UI_FONTS = [
+	`-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto"`,
+	`"Oxygen", "Ubuntu", "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji"`,
+	`"Segoe UI Emoji", "Segoe UI Symbol"`,
+].join(', ')
 
 const MODEL = {
 	name: (deckName) => `${deckName}_model`,
@@ -28,8 +44,9 @@ const MODEL = {
 		/* [X] */ 'furigana',
 		/* [X] */ 'frequency',
 		/* [X] */ 'audio',
+		/* [X] */ 'audio-alt',
 		/* [ ] */ 'radicals',
-		/* [ ] */ 'notes',
+		/* [X] */ 'notes',
 		/* [X] */ 'kanji',
 		/* [X] */ 'glossary',
 		/* [ ] */ 'image',
@@ -63,9 +80,9 @@ const MODEL = {
 	`,
 
 	back: `
-		<h1 class="reading">
-		{{furigana}}
-		<span class="audio">{{audio}} {{^audio}}{{tts ja_JP:expression}}{{/audio}}</span>
+		<h1>
+		<span class="reading">{{furigana}}</span>
+		<span class="audio">{{audio}}{{audio-alt}}{{^audio}}{{tts ja_JP:expression}}{{/audio}}</span>
 		</h1>
 		{{#expression-alt}}<h2 class="reading">({{expression-alt}})</h2>{{/expression-alt}}
 		${STATS}
@@ -78,15 +95,22 @@ const MODEL = {
 		</div>
 		{{/example-read}}
 
+		{{#notes}}
+		<hr>
+		<div class="notes japanese-alt">{{notes}}</div>
+		{{/notes}}
+
 		<hr>
 		{{#reading}}
-		<div style="font-size: 0.5em; font-family: Japanese-alt; color: ${CLR_GREY}; opacity: 0.7">{{reading}}</div>
+		<div style="font-size: 0.5em; font-family: Japanese-alt; color: ${C_GREY}; opacity: 0.7">{{reading}}</div>
 		{{/reading}}
 		<div class="glossary">{{glossary}}</div>
 
 		{{#kanji}}
 		<hr><div class="kanji">{{kanji}}</div>
 		{{/kanji}}
+
+		<script>onAnswer()</script>
 	`,
 
 	css: `
@@ -120,23 +144,25 @@ const MODEL = {
 		.card {
 			font-size: 5vw;
 			text-align: center;
-			font-family:
-				Main, Japanese,
-				'ヒラギノ角ゴ ProN', 'Hiragino Kaku Gothic ProN', '游ゴシック', '游ゴシック体',
-				YuGothic, 'Yu Gothic', 'メイリオ', Meiryo, 'ＭＳ ゴシック', 'MS Gothic',
-				HiraKakuProN-W3, 'TakaoExゴシック', TakaoExGothic, 'MotoyaLCedar',
-				'Droid Sans Japanese',
-				"calibri", "Candara", "Segoe", "Segoe UI", "Optima", Arial, sans-serif;
+			font-family: Main, Japanese, ${JP_FONTS};
 		}
 
-		h1, h2       { font-weight: normal; font-size: 1.5em; position: relative; }
+		.japanese-alt { font-family: Main, Japanese-alt, ${JP_FONTS}; }
+		.ui-text      { font-family: Japanese-alt, ${UI_FONTS}; }
+
+		h1, h2       { font-weight: normal; font-size: 1.5em; position: relative; margin-right: 0; margin-left: 0; }
 		h2           { font-size: 1.1em;  }
 		h1 + h2      { margin-top: -0.3em; }
 		h1 rt, h2 rt { font-size: 0.3em;  }
 
-		a, a:visited, a:hover { color: #bfdfff !important; text-decoration: none; }
+		i { display: none; color: ${C_SECONDARY}; font-style: normal; font-size: 0.8em; }
 
-		rt { color: ${CLR_HIGH}; visibility: hidden; font-family: Japanese-alt; }
+		a, a:visited, a:hover { color: ${C_LINK} !important; text-decoration: none; }
+
+		.button { color: ${C_LINK}; cursor: pointer; opacity: 0.3; transition: opacity 0.3s; }
+		.button:hover { opacity: 1.0; }
+
+		rt { color: ${C_HIGH}; visibility: hidden; font-family: Japanese-alt; }
 		.reading { cursor: pointer; }
 
 		.audio { display: inline-block; position: absolute; right: 10px; transform: scale(0.5); margin-top: -0.15em; }
@@ -145,7 +171,9 @@ const MODEL = {
 		.stroke  { font-family: Stroke, Japanese-alt; }
 
 		.glossary { font-size: 0.5em; display: inline-block; text-align: left; max-width: 70%; }
-		.glossary em { display: inline-block; margin-left: 20px; font-size: 0.9em; font-style: normal; color: ${CLR_HIGH}; float: right; }
+		.glossary em { display: inline-block; margin-left: 20px; font-size: 0.9em; font-style: normal; color: ${C_HIGH}; float: right; }
+
+		.notes { display: inline-block; max-width: 70%; font-size: 0.5em; opacity: 0.7; }
 
 		.kanji { max-width: 70%; display: inline-block; text-align: left; }
 		.kanji > span {
@@ -168,6 +196,24 @@ const MODEL = {
 			font-style: normal;
 			font-family: Stroke, Japanese-alt;
 			font-size: 3em;
+		}
+
+		.tooltip {
+			font-family: Main, Japanese-alt, ${JP_FONTS};
+			display: block;
+			background-color: black;
+			color: #e0e0e0;
+			font-size: 14px;
+			line-height: 20px;
+			position: fixed;
+			padding: 10px;
+			z-index: 10000;
+			transition: opacity 0.3s;
+			top: 10px; left: 10px;
+			min-width: 100px;
+			text-align: center;
+			opacity: 0;
+			visibility: hidden;
 		}
 
 		/*
@@ -290,11 +336,9 @@ async function addNote(mainDeck, note) {
 	fields['furigana'] = v(note.furigana)
 	fields['frequency'] = v(note.frequency)
 	fields['audio'] = v(note.audio)
-	fields['radicals'] = v(note.radicals)
-	fields['notes'] = v(note.notes)
+	fields['audio-alt'] = v(note.audio_alt)
 	fields['kanji'] = v(note.kanji)
 	fields['glossary'] = v(note.glossary)
-	fields['image'] = v(note.image)
 	fields['example-main'] = v(note.example_main)
 	fields['example-text'] = v(note.example_text)
 	fields['example-read'] = v(note.example_read)
