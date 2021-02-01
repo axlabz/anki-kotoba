@@ -108,6 +108,10 @@ async function listNewNotes() {
 				return output.join('\n')
 			})(it.kanji),
 
+			pitch_accents: it.pitch_accents,
+			pitch_accent_graphs: it.pitch_accent_graphs,
+			pitch_accent_positions: it.pitch_accent_positions,
+
 			yomichan_id: it.id, // ID of the source Yomichan note.
 			yomichan_audio: it.audio, // Audio from Yomichan.
 			yomichan_glossary: it.glossary, // Original glossary (for reference and comparison).
@@ -178,6 +182,10 @@ async function listYomichanEntries({ word, reading, onlyNew }) {
 
 		// Keep a copy of the original glossary for reference.
 		glossary: it.fields['glossary'].value,
+
+		pitch_accents: it.fields['pitch-accents'].value,
+		pitch_accent_graphs: it.fields['pitch-accent-graphs'].value,
+		pitch_accent_positions: it.fields['pitch-accent-positions'].value,
 	}))
 
 	return output.filter((it) => {

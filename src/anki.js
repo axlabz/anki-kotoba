@@ -42,6 +42,7 @@ const MODEL = {
 		'expression',
 		'expression-alt',
 		'reading',
+		'hint',
 		'furigana',
 		'frequency',
 		'audio',
@@ -56,6 +57,9 @@ const MODEL = {
 		'example-read',
 		'example-audio',
 		'example-image',
+		'pitch-accents',
+		'pitch-accent-graphs',
+		'pitch-accent-positions',
 		'yomichan-id',
 		'yomichan-audio',
 		'yomichan-glossary',
@@ -72,9 +76,7 @@ const MODEL = {
 		{{#expression-alt}}<h2 class="reading">({{expression-alt}})</h2>{{/expression-alt}}
 		${STATS}
 
-		{{#example-read}}
-		<hr><span class="reading">{{example-read}}</span>
-		{{/example-read}}
+		{{#hint}}({{hint}}){{/hint}}
 
 		<script>
 		%SCRIPT%</script>
@@ -93,6 +95,8 @@ const MODEL = {
 		</h1>
 		{{#expression-alt}}<h2 class="reading">({{expression-alt}})</h2>{{/expression-alt}}
 		${STATS}
+
+		{{#hint}}({{hint}}){{/hint}}
 
 		{{#example-read}}
 		<div style="position: relative">
@@ -126,8 +130,16 @@ const MODEL = {
 		{{#radicals}}<hr><div class="radical-container" data-radicals="{{text:radicals}}"></div>{{/radicals}}
 
 		{{#kanji}}
-		<hr><div class="kanji">{{kanji}}</div>
+		<hr><div class="kanji-container"><div class="kanji">{{kanji}}</div></div>
 		{{/kanji}}
+
+		{{#pitch-accents}}
+			<hr>
+			<div class="pitch">
+			{{pitch-accents}}
+			{{pitch-accent-graphs}}
+			</div>
+		{{/pitch-accents}}
 
 		<script>onAnswer()</script>
 	`,
@@ -222,20 +234,46 @@ const MODEL = {
 		.radical-stroke    { color: ${C_GREY}; font-size: 12px; padding: 0 3px 0 3px; }
 		.radical-meaning   { padding-left: 5px; }
 
-		.kanji { max-width: 70%; display: inline-block; text-align: left; }
+		.kanji-container {
+			display: inline-block;
+		}
+
+		.kanji {
+			display: flex;
+			flex-wrap: wrap;
+			flex-direction: row;
+			justify-content: center;
+			align-items: auto;
+			align-content: center;
+		}
+
 		.kanji > span {
+			flex: 1 1 auto;
 			display: flex;
 			flex-wrap: nowrap;
 			flex-direction: row;
 			justify-content: start;
 			align-items: center;
-			align-content: start
+			align-content: start;
 		}
 		.kanji > span > *  { flex: 1 1 auto; }
-		.kanji > span > ul { margin: 0; padding: 0; list-style-type: none; }
-		.kanji > span li   { display: inline; font-size: 0.5em}
-		.kanji > span li:after { content: ', ' }
-		.kanji > span li:last-child:after { content: '' }
+		.kanji > span > ul {
+			margin: 0;
+			padding: 0;
+			list-style-type: none;
+			display: flex;
+			flex-wrap: nowrap;
+			flex-direction: column;
+			justify-content: start;
+			align-items: start;
+			align-content: start;
+		}
+		.kanji > span li {
+			font-size: 0.4em;
+			flex: 0 0 auto;
+		}
+		.kanjix > span li:after { content: ', ' }
+		.kanjix > span li:last-child:after { content: '' }
 
 		.kanji > span > em {
 			width: 1.2em;
@@ -243,6 +281,26 @@ const MODEL = {
 			font-style: normal;
 			font-family: Stroke, Japanese-alt;
 			font-size: 3em;
+		}
+
+		.pitch {
+			font-family: Radicals, Japanese-alt, ${JP_FONTS};
+			font-size: 0.5em;
+			display: flex;
+			flex-wrap: wrap;
+			flex-direction: row;
+			justify-content: center;
+			align-items: auto;
+			align-content: start
+		}
+
+		.pitch > * {
+			flex: 0 0 auto;
+			margin: 10px;
+		}
+
+		.pitch svg path, .pitch svg circle {
+			stroke: #E0E0E0 !important;
 		}
 
 		.tooltip {
@@ -346,6 +404,11 @@ async function addNote(mainDeck, note) {
 	fields['example-read'] = v(note.example_read)
 	fields['example-audio'] = v(note.example_audio)
 	fields['example-image'] = v(note.example_image)
+
+	fields['pitch-accents'] = v(note.pitch_accents)
+	fields['pitch-accent-graphs'] = v(note.pitch_accent_graphs)
+	fields['pitch-accent-positions'] = v(note.pitch_accent_positions)
+
 	fields['yomichan-id'] = v(note.yomichan_id)
 	fields['yomichan-audio'] = v(note.yomichan_audio)
 	fields['yomichan-glossary'] = v(note.yomichan_glossary)
