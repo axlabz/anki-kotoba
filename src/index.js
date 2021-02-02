@@ -155,6 +155,8 @@ async function listYomichanEntries({ word, reading, onlyNew }) {
 	onlyNew && tags.push(TAG_YOMICHAN_NEW)
 
 	const ls = await queryNotes({ deck: YOMICHAN_DECK, keywords, tags })
+
+	const pitchValue = (v) => (v.toLowerCase() == 'no pitch accent data' ? '' : v)
 	const output = ls.map((it) => ({
 		id: it.noteId,
 		key: it.fields['furigana-plain'].value,
@@ -183,9 +185,9 @@ async function listYomichanEntries({ word, reading, onlyNew }) {
 		// Keep a copy of the original glossary for reference.
 		glossary: it.fields['glossary'].value,
 
-		pitch_accents: it.fields['pitch-accents'].value,
-		pitch_accent_graphs: it.fields['pitch-accent-graphs'].value,
-		pitch_accent_positions: it.fields['pitch-accent-positions'].value,
+		pitch_accents: pitchValue(it.fields['pitch-accents'].value),
+		pitch_accent_graphs: pitchValue(it.fields['pitch-accent-graphs'].value),
+		pitch_accent_positions: pitchValue(it.fields['pitch-accent-positions'].value),
 	}))
 
 	return output.filter((it) => {
