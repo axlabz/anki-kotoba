@@ -5,6 +5,7 @@ const fetch = require('node-fetch')
 // spell-checker: disable
 
 const C_HIGH = '#ffd154'
+const C_EMPHASIS = '#ffe396'
 const C_GREY = '#c0c0c0'
 const C_LINK = '#00c3ff'
 const C_SECONDARY = '#0092bf'
@@ -197,7 +198,8 @@ const MODEL = {
 		.button { color: ${C_GREY}; cursor: pointer; opacity: 0.2; transition-property: opacity, color; transition-duration: 0.5s; }
 		.button:hover { color: ${C_LINK}; opacity: 1.0; }
 
-		.reading { cursor: pointer; }
+		.reading   { cursor: pointer; }
+		.reading b { font-weight: normal; color: ${C_EMPHASIS}; }
 
 		.audio { display: inline-block; position: absolute; right: 10px; transform: scale(0.5); margin-top: -0.15em; }
 
