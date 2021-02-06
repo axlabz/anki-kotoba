@@ -5,6 +5,7 @@
 	"words": [
 		"anki",
 		"dbpedia",
+		"forvo",
 		"furigana",
 		"jisho",
 		"jlpt",
@@ -14,6 +15,7 @@
 		"kotoba",
 		"lcov",
 		"serializers",
+		"tatoeba",
 		"unmocked",
 		"wanakana",
 		"wanikani",

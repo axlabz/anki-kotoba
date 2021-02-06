@@ -225,6 +225,7 @@ const MODEL = {
 			font-style: normal;
 			color: ${C_HIGH};
 			float: right;
+			cursor: default;
 		}
 
 		.radical-container {
