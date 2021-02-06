@@ -234,6 +234,7 @@ function radicalsList() {
 		5	⺛		not	a variant of ⽆（むにょう）
 		5	台		pedestal	stand, me, private, mouth
 		5	古		tomb	old
+		5	右		right	mouth
 		6	⽵		bamboo
 		6	⺮	top	bamboo hat	a variant of ⽵（たけ）	Important
 		6	⽶		rice
