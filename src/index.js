@@ -13,6 +13,11 @@ const { initAnki, addNote, queryAnki } = require('./anki')
 const TAG_YOMICHAN_NEW = 'yomichan-new'
 
 /**
+ * Yomichan tag to ignore from notes.
+ */
+const TAG_YOMICHAN = 'yomichan'
+
+/**
  * The main deck to which vocabulary notes will be generated.
  */
 const MAIN_DECK = 'Japanese::Vocabulary'
@@ -88,6 +93,8 @@ async function listNewNotes() {
 			glossary: it.text, // Vocabulary in english (HTML).
 			frequency: it.frequency, // Frequency (number of usages in corpus text).
 			audio: '',
+
+			note_tags: it.note_tags, // Additional note tags in Anki
 
 			kanji: ((kanji) => {
 				const output = kanji.map((k) => {
@@ -169,6 +176,8 @@ async function listYomichanEntries({ word, reading, onlyNew }) {
 			.join(','),
 		furigana_text: it.fields['furigana-plain'].value,
 		furigana_html: it.fields['furigana'].value,
+
+		note_tags: (it.tags || []).filter((x) => x != TAG_YOMICHAN && x != TAG_YOMICHAN_NEW),
 
 		audio: it.fields['audio'].value,
 

@@ -432,7 +432,7 @@ async function addNote(mainDeck, note) {
 					allowDuplicate: false,
 					duplicateScope: 'deck',
 				},
-				tags: MODEL.tagsNew,
+				tags: [].concat(MODEL.tagsNew, note.note_tags),
 			},
 		})
 		if (id) {
@@ -448,6 +448,12 @@ async function addNote(mainDeck, note) {
 				fields: fields,
 			},
 		})
+		for (const tag of note.note_tags) {
+			await queryAnki('addTags', {
+				notes: [id],
+				tags: tag,
+			})
+		}
 		console.log(`Updated note ${id} for ${note.key}`)
 	}
 	return true
