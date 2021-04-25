@@ -142,6 +142,12 @@ const MODEL = {
 			</div>
 		{{/pitch-accents}}
 
+		<hr>
+		<div style="font-size: 0.7em">
+		<div style="font-size: 0.5em; opacity: 0.5; text-align: left">Source:</div>
+		{{yomichan-sentence}}
+		</div>
+
 		<script>onAnswer()</script>
 	`,
 
