@@ -32,6 +32,8 @@ const UI_FONTS = [
 	`"Segoe UI Emoji", "Segoe UI Symbol"`,
 ].join(', ')
 
+const INCLUDE_SENTENCES_FRONT = false
+
 const MODEL = {
 	name: (deckName) => `${deckName}_model`,
 
@@ -72,13 +74,28 @@ const MODEL = {
 		'core-sentence-read',
 	],
 
-	front: `
+	front:
+		`
 		<h1 class="reading">{{furigana}}</h1>
 		{{#expression-alt}}<h2 class="reading">({{expression-alt}})</h2>{{/expression-alt}}
 		${STATS}
 
 		{{#hint}}({{hint}}){{/hint}}
 
+		` +
+		(INCLUDE_SENTENCES_FRONT
+			? `
+		<hr>
+
+		{{#yomichan-sentence}}
+		<div class="sentence">{{yomichan-sentence}}</div>
+		{{/yomichan-sentence}}
+		{{#example-main}}
+		<div class="sentence">{{example-main}}</div>
+		{{/example-main}}
+		`
+			: ``) +
+		`
 		<script>
 		%SCRIPT%</script>
 	`,
@@ -183,6 +200,12 @@ const MODEL = {
 			font-size: 40px;
 			text-align: center;
 			font-family: Main, Japanese, ${JP_FONTS};
+		}
+
+		.sentence {
+			font-size: 70%;
+			padding-top: 20px;
+			opacity: 0.7;
 		}
 
 		.japanese-alt { font-family: Main, Japanese-alt, ${JP_FONTS}; }
