@@ -103,6 +103,11 @@ const MODEL = {
 	back: `
 		<h1>
 		<span class="reading">{{furigana}}</span>
+
+		{{#reading}}
+		<div style="font-size: 0.3em; font-family: Japanese-alt; color: ${C_GREY}; opacity: 0.7">{{reading}}</div>
+		{{/reading}}
+
 		<span class="audio">
 			{{audio}}{{audio-alt}}
 			{{^audio}}
@@ -130,9 +135,6 @@ const MODEL = {
 		{{/notes}}
 
 		<hr>
-		{{#reading}}
-		<div style="font-size: 0.5em; font-family: Japanese-alt; color: ${C_GREY}; opacity: 0.7">{{reading}}</div>
-		{{/reading}}
 		<div class="glossary">{{glossary}}</div>
 
 		<div style="font-size: 0.4em">
