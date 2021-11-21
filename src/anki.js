@@ -490,6 +490,34 @@ async function addNote(mainDeck, note) {
 	return true
 }
 
+async function exportAnki(filename, deck) {
+	const t0 = Date.now()
+	const ids = await queryAnki('findNotes', {
+		query: `"deck:${deck}" AND -"is:suspended" AND -"is:new"`,
+	})
+	const d0 = (Date.now() - t0) / 1000
+	console.log(`Found ${ids.length} cards in ${d0.toFixed(3)}s`)
+
+	const t1 = Date.now()
+	const info = await queryAnki('notesInfo', {
+		notes: ids,
+	})
+	const d1 = (Date.now() - t1) / 1000
+	console.log(`Loaded ${info.length} cards in ${d1.toFixed(3)}s`)
+
+	const output = info.map(({ noteId, fields }) => ({
+		id: noteId,
+		expr: fields.expression.value,
+		read: fields.reading.value,
+	}))
+
+	const t2 = Date.now()
+	const outputJSON = JSON.stringify(output, null, '\t')
+	fs.writeFileSync(filename, outputJSON, 'utf-8')
+	const d2 = (Date.now() - t2) / 1000
+	console.log(`Exported to ${filename} in ${d2.toFixed(3)}s`)
+}
+
 /**
  * Send a request to Anki (depends on the anki-connect plugin being installed).
  */
@@ -531,6 +559,7 @@ function text(txt) {
 }
 
 module.exports = {
+	exportAnki,
 	initAnki,
 	addNote,
 	queryAnki,

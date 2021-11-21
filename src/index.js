@@ -5,7 +5,7 @@ const fs = require('fs')
 
 const kanji = require('./kanji')
 const tag = require('./tag')
-const { initAnki, addNote, queryAnki } = require('./anki')
+const { initAnki, addNote, queryAnki, exportAnki } = require('./anki')
 
 /**
  * Tag added to new entries by Yomichan.
@@ -49,6 +49,13 @@ main().catch((err) => console.error(err))
  * Main function for this script.
  */
 async function main() {
+	const args = process.argv.slice(2)
+	if (args[0] == 'export') {
+		console.log('Exporting ANKI deck!')
+		await exportAnki('./data/export-anki-list.json', MAIN_DECK)
+		return
+	}
+
 	await initAnki(MAIN_DECK)
 
 	// Write the radical index HTML files to the media folder.

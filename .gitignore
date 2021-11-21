@@ -1,5 +1,7 @@
 build
 
+data/export*.json
+
 # Logs
 logs
 *.log
