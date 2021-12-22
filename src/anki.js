@@ -82,6 +82,17 @@ const MODEL = {
 
 		{{#hint}}({{hint}}){{/hint}}
 
+		{{#example-read}}
+		<hr>
+		{{example-read}}
+		{{/example-read}}
+
+
+		{{#yomichan-sentence}}
+		<hr>
+		<div style="font-size: 0.7em">{{yomichan-sentence}}</div>
+		{{/yomichan-sentence}}
+
 		` +
 		(INCLUDE_SENTENCES_FRONT
 			? `
