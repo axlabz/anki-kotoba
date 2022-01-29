@@ -25,6 +25,7 @@ The original Yomichan glossary definition, before being compacted and de-duplica
 
 <img src="https://i.imgur.com/zFr8dk1.png" width="200" title="Original glossary">
 
+
 ## Card Layout Features
 
 Furigana readings are available as mouse-over tooltips, or can be toggled by 
@@ -40,6 +41,7 @@ Tag tooltip and external links:
 
 <img src="https://i.imgur.com/GRF1jqa.png" width="300" />
 
+
 ## How to Install
 
 This script requires [Node.js](https://nodejs.org/). Any recent version will do.
@@ -48,6 +50,7 @@ Download the source code to a directory and open a command line in that director
 Run the command `npm install` in the command line to download the script dependencies to the local directory. Note that everything is done on the local directory and nothing will be installed or changed on the computer itself.
 
 Make sure to setup Anki as instructed below. After that, you can just add cards using Yomichan and run this script using the command `npm start` to import them to your vocabulary.
+
 
 ## Setting up Anki
 
